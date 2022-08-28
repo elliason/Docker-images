@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+const {Command} = require('commander');
+const shell = require('shelljs');
+const path = require('path');
+const fs = require("fs");
+const { infoLog } = require('platypus-tools');
+
+const envFilePath = path.resolve(__dirname, '../.env');
+if (!fs.existsSync(envFilePath)) {
+    throw new Error('Missing .env file.');
+}
+require('dotenv').config({ path: envFilePath });
+
+const program = new Command();
+
+program
+    .description('Build and push a docker image')
+    .argument('<contextPath>', 'context path to build')
+    .option('-p, --push', 'push to docker hub')
+    .option('-r, --repository', 'docker image repo')
+    .option('-t, --tag', 'image tag')
+    .option('-u, --user', 'docker username')
+    .action((contextPath, options) => {
+        const context = path.normalize(process.cwd() + '/repositories/' + contextPath);
+        const push = options.push ?? false;
+        const repository = options.repository ?? path.basename(context); // if no tag is specified use folder name as repository name
+        const tag = options.tag ?? "latest"
+        const user = options.user ?? process.env.DEFAULT_DOCKER_USERNAME;
+
+        infoLog('--- building docker image ---')
+        infoLog("push:" + push)
+        infoLog("repository:" + repository)
+        infoLog("tag:" + tag)
+        infoLog("user:" + user)
+
+        shell.exec(`docker build -t ${user}/${repository}:${tag} ${context}`);
+
+        if (push) {
+            shell.exec(`docker login && docker push ${user}/${repository}:${tag}`)
+        }
+    });
+
+program.parse(process.argv);

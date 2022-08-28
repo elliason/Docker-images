@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+const {Command} = require('commander');
+const child_process = require("child_process");
+
+const program = new Command();
+
+program
+    .description('Run a docker image')
+    .argument('<image>', 'image to run')
+    .action((image) => {
+        // cant run this via shelljs because it doesn't support interactive mode
+        // more info: https://github.com/shelljs/shelljs/issues/680
+        child_process.spawnSync('docker', [ 'run', '--rm', '-ti', image, '/bin/bash' ], {
+            stdio: 'inherit'
+        });
+    })
+
+program.parse(process.argv);

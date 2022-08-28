@@ -1,0 +1,19 @@
+{
+  "name": "docker-images",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:elliason/Docker-images.git",
+  "author": "Elias Ondrej <info@eliasondrej.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "commander": "^9.4.0",
+    "dotenv": "^16.0.1",
+    "platypus-tools": "^0.0.9",
+    "shelljs": "^0.8.5"
+  },
+  "scripts": {
+    "build": "cli/build",
+    "start": "cli/start"
+  }
+}
