@@ -23,8 +23,8 @@ program
     .action((contextPath, options) => {
         const context = path.normalize(process.cwd() + '/repositories/' + contextPath);
         const push = options.push ?? false;
-        const repository = options.repository ?? path.basename(context); // if no tag is specified use folder name as repository name
-        const tag = options.tag ?? "latest"
+        const repository = options.repository ?? path.basename(path.dirname(context)); // if no tag is specified use folder name as repository name
+        const tag = options.tag ?? path.basename(context)
         const user = options.user ?? process.env.DEFAULT_DOCKER_USERNAME;
 
         infoLog('--- building docker image ---')
@@ -34,6 +34,8 @@ program
         infoLog("user:" + user)
 
         shell.exec(`docker build -t ${user}/${repository}:${tag} ${context}`);
+
+        infoLog(`${user}/${repository}:${tag}`);
 
         if (push) {
             shell.exec(`docker login && docker push ${user}/${repository}:${tag}`)
