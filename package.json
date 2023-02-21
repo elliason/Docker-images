@@ -16,7 +16,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "cli/build",
-    "start": "cli/start"
+    "start": "cli/start",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@media-factory-cz/prettier-config": "^1.0.3",

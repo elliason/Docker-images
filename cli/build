@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const {Command} = require('commander');
+const { Command } = require('commander');
 const shell = require('shelljs');
 const path = require('path');
-const fs = require("fs");
+const fs = require('fs');
 const { infoLog } = require('platypus-tools');
 
 const envFilePath = path.resolve(__dirname, '../.env');
@@ -24,21 +24,25 @@ program
         const context = path.normalize(process.cwd() + '/repositories/' + contextPath);
         const push = options.push ?? false;
         const repository = options.repository ?? path.basename(path.dirname(context)); // if no tag is specified use folder name as repository name
-        const tag = options.tag ?? path.basename(context)
+        const tag = options.tag ?? path.basename(context);
         const user = options.user ?? process.env.DEFAULT_DOCKER_USERNAME;
 
-        infoLog('--- building docker image ---')
-        infoLog("push:" + push)
-        infoLog("repository:" + repository)
-        infoLog("tag:" + tag)
-        infoLog("user:" + user)
+        infoLog('--- building docker image ---');
+
+        infoLog('user:' + user);
+        console.log('---');
+        infoLog('repository:' + repository);
+        console.log('---');
+        infoLog('tag:' + tag);
+        console.log('---');
+        infoLog('pushing to remote repository:' + push);
 
         shell.exec(`docker build -t ${user}/${repository}:${tag} ${context}`);
 
         infoLog(`${user}/${repository}:${tag}`);
 
         if (push) {
-            shell.exec(`docker login && docker push ${user}/${repository}:${tag}`)
+            shell.exec(`docker login && docker push ${user}/${repository}:${tag}`);
         }
     });
 

@@ -1,12 +1,10 @@
 # Docker images
 
-### Usage
-
 ```bash
 pnpm build <repository path>
 ```
 
-#### Options
+## Options
 
 - `-p`: push image to registry
 - `-r <repo>`: set repository other than folder name
