@@ -17,5 +17,5 @@ pnpm build <repository path>
 
 ```bash
 pnpm build php/php-fpm -p
-pnpm build node/node/18-alpine3.16 -p
+pnpm build node/18-alpine3.16 -p
 ```

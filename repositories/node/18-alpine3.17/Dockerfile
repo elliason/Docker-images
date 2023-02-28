@@ -26,6 +26,15 @@ RUN apk add --no-cache libjpeg-turbo \
 
 USER node
 
-RUN wget -qO- https://get.pnpm.io/install.sh | ENV="~/.bashrc" SHELL="$(which bash)" bash -
+# RUN wget -qO- https://get.pnpm.io/install.sh | ENV="~/.bashrc" SHELL="$(which bash)" bash -
 
-WORKDIR /app
+# RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
+
+# ENV PNPM_HOME="/home/node/.local/share/pnpm"
+# ENV PATH="$PNPM_HOME:$PATH"
+
+RUN "npm install -g pnpm"
+
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /var/www/html

@@ -2,14 +2,12 @@ FROM node:18
 
 LABEL org.opencontainers.image.authors="info@eliasondrej.com"
 
-RUN apk update && apk upgrade
-
-RUN mkdir /app \
-    && chown -R node:node /app \
-    && chmod -R 775 /app
+RUN apt-get update && apt-get upgrade -y
 
 USER node
 
-RUN curl -fsSL https://get.pnpm.io/install.sh | sh -
+RUN curl -fsSL https://get.pnpm.io/install.sh | bash -
 
-WORKDIR /app
+RUN npm install -g pnpm
+
+WORKDIR /var/www/html
