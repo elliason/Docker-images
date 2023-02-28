@@ -6,7 +6,7 @@ RUN apt-get update && apt-get upgrade -y
 
 USER node
 
-RUN curl -fsSL https://get.pnpm.io/install.sh | bash -
+RUN "npm install -g pnpm"
 
 RUN npm install -g pnpm
 
