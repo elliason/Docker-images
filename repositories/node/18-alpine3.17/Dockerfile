@@ -8,10 +8,6 @@ RUN apk add --no-cache bash \
     bash-completion \
     curl
 
-RUN mkdir /app \
-    && chown -R node:node /app \
-    && chmod -R 775 /app
-
 RUN apk add --no-cache libjpeg-turbo \
     libjpeg-turbo-dev \
     libpng \
@@ -24,9 +20,9 @@ RUN apk add --no-cache libjpeg-turbo \
     libc6-compat \
     ffmpeg
 
-USER node
+RUN npm install -g pnpm
 
-RUN "npm install -g pnpm"
+USER node
 
 SHELL ["/bin/bash", "-c"]
 
