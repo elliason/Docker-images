@@ -1,4 +1,4 @@
-FROM node:22-bullseye
+FROM node:24-bullseye
 
 LABEL org.opencontainers.image.authors="info@eliasondrej.com"
 

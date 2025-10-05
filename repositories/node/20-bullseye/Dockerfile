@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.authors="info@eliasondrej.com"
 
 RUN npm install -g pnpm
 
-RUN apt-get install iputils-ping -y
+RUN npm install -g tsx
 
 USER node
 
