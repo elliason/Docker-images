@@ -20,12 +20,16 @@ program
     .option('-r, --repository', 'docker image repo')
     .option('-t, --tag', 'image tag')
     .option('-u, --user', 'docker username')
+    .option('--platform <platforms>', 'comma-separated list of platforms (default: linux/amd64,linux/arm64)')
+    .option('--load', 'load the image into docker after build (only works with single platform)')
     .action((contextPath, options) => {
         const context = path.normalize(process.cwd() + '/repositories/' + contextPath);
         const push = options.push ?? false;
         const repository = options.repository ?? path.basename(path.dirname(context)); // if no tag is specified use folder name as repository name
         const tag = options.tag ?? path.basename(context);
         const user = options.user ?? process.env.DEFAULT_DOCKER_USERNAME;
+        const platforms = options.platform;
+        const load = options.load ?? false;
 
         infoLog('--- building docker image ---');
 
@@ -35,13 +39,65 @@ program
         console.log('---');
         infoLog('tag:' + tag);
         console.log('---');
+        if (platforms) {
+            infoLog('platforms:' + platforms);
+            console.log('---');
+        }
         infoLog('pushing to remote repository:' + push);
 
-        shell.exec(`docker build -t ${user}/${repository}:${tag} ${context}`);
+        // Ensure buildx builder exists for multiplatform builds
+        if (platforms) {
+            infoLog('Setting up buildx builder for multiplatform build...');
+            const builderName = 'multiplatform-builder';
+            
+            // Check if builder exists
+            const builderExists = shell.exec(`docker buildx inspect ${builderName}`, { silent: true });
+            
+            if (builderExists.code !== 0) {
+                infoLog('Creating multiplatform builder...');
+                const createResult = shell.exec(`docker buildx create --name ${builderName} --driver docker-container --bootstrap --use`);
+                if (createResult.code !== 0) {
+                    shell.echo('Error: Failed to create buildx builder');
+                    shell.exit(1);
+                }
+            } else {
+                const useResult = shell.exec(`docker buildx use ${builderName}`);
+                if (useResult.code !== 0) {
+                    shell.echo('Error: Failed to use buildx builder');
+                    shell.exit(1);
+                }
+            }
+        }
+
+        // Build command construction
+        let buildCommand;
+        if (platforms) {
+            // Use buildx for multiplatform builds
+            buildCommand = `docker buildx build --platform ${platforms} -t ${user}/${repository}:${tag}`;
+            
+            if (push) {
+                buildCommand += ' --push';
+            } else if (load) {
+                buildCommand += ' --load';
+            }
+            
+            buildCommand += ` ${context}`;
+        } else {
+            // Use regular docker build for single platform
+            buildCommand = `docker build -t ${user}/${repository}:${tag} ${context}`;
+        }
+
+        const result = shell.exec(buildCommand);
+
+        if (result.code !== 0) {
+            shell.echo('Error: Build failed');
+            shell.exit(1);
+        }
 
         infoLog(`${user}/${repository}:${tag}`);
 
-        if (push) {
+        if (push && !platforms) {
+            // Only push separately if not using buildx (buildx pushes with --push flag)
             shell.exec(`docker login && docker push ${user}/${repository}:${tag}`);
         }
     });
